@@ -17,14 +17,12 @@ public class FilesCodeLinesCounterDemo {
     System.out.println("Enter full file name or path to a Directory: ");
     String path = scanner.nextLine();
 
-    FilesCodeLinesCounterDemo tmp = new FilesCodeLinesCounterDemo();
-
     try {
       FileNode fileNode = createFileNodes(path, new ArrayList<>(), 0);
       System.out.println(fileNode.toString());
-    } catch (FileNotFoundException e) {
+    } catch (FileNotFoundException ex) {
       System.out.println(String.format("Could not find file: [%s]", path));
-      e.printStackTrace();
+      ex.printStackTrace();
     }
   }
 
@@ -36,7 +34,8 @@ public class FilesCodeLinesCounterDemo {
     FileNode resultNode = FileNode.createDirectory(currentDirectory.getName());
     if (null == fileList) {
       if (currentDirectory.isFile()) {
-        calculateLinesWithCode(currentDirectory.getAbsolutePath());
+        return FileNode.createFile(
+            currentDirectory.getName(), calculateLinesWithCode(currentDirectory.getAbsolutePath()));
       }
       return resultNode;
     }
@@ -53,6 +52,4 @@ public class FilesCodeLinesCounterDemo {
     }
     return resultNode;
   }
-
-
 }
