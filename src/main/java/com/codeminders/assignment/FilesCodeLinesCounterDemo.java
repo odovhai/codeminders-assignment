@@ -2,6 +2,7 @@ package com.codeminders.assignment;
 
 import static com.codeminders.assignment.util.FileLinesCounter.calculateLinesWithCode;
 
+import com.codeminders.assignment.file.FileNode;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -13,47 +14,45 @@ public class FilesCodeLinesCounterDemo {
   public static void main(String[] args) {
 
     Scanner scanner = new Scanner(System.in);
-    System.out.println("Enter full file name or path to a directory: ");
+    System.out.println("Enter full file name or path to a Directory: ");
     String path = scanner.nextLine();
 
+    FilesCodeLinesCounterDemo tmp = new FilesCodeLinesCounterDemo();
+
     try {
-      listFilesLinesCount(path, new ArrayList<>(), 0);
+      FileNode fileNode = tmp.listFilesLinesCount(path, new ArrayList<>(), 0);
+      System.out.println(fileNode.toString());
     } catch (FileNotFoundException e) {
       System.out.println(String.format("Could not find file: [%s]", path));
       e.printStackTrace();
     }
   }
 
-  private static void listFilesLinesCount(String directoryName, List<File> files, int nesting)
+  private FileNode listFilesLinesCount(String directoryName, List<File> files, int nesting)
       throws FileNotFoundException {
     File currentDirectory = new File(directoryName);
 
     File[] fileList = currentDirectory.listFiles();
+    FileNode resultNode = FileNode.createDirectory(currentDirectory.getName());
     if (null == fileList) {
       if (currentDirectory.isFile()) {
-        System.out.println(
-            currentDirectory.getName()
-                + ": "
-                + calculateLinesWithCode(currentDirectory.getAbsolutePath()));
+        calculateLinesWithCode(currentDirectory.getAbsolutePath());
       }
-      return;
+      return resultNode;
     }
+
     for (File file : fileList) {
-      printIndent(nesting);
       if (file.isFile()) {
         int linesCount = calculateLinesWithCode(file.getAbsolutePath());
-        System.out.println(file.getName() + ": " + linesCount);
         files.add(file);
+        FileNode newLeaf = FileNode.createFile(file.getName(), linesCount);
+        resultNode.addLeaf(newLeaf);
       } else if (file.isDirectory()) {
-        System.out.println(file.getName() + ": ");
-        listFilesLinesCount(file.getAbsolutePath(), files, nesting + 1);
+        resultNode.addChild(listFilesLinesCount(file.getAbsolutePath(), files, nesting + 1));
       }
     }
+    return resultNode;
   }
 
-  private static void printIndent(int nesting) {
-    for (int i = 0; i < nesting; i++) {
-      System.out.print(" ");
-    }
-  }
+
 }
