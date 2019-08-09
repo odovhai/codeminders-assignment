@@ -20,7 +20,7 @@ public class FilesCodeLinesCounterDemo {
     FilesCodeLinesCounterDemo tmp = new FilesCodeLinesCounterDemo();
 
     try {
-      FileNode fileNode = tmp.listFilesLinesCount(path, new ArrayList<>(), 0);
+      FileNode fileNode = createFileNodes(path, new ArrayList<>(), 0);
       System.out.println(fileNode.toString());
     } catch (FileNotFoundException e) {
       System.out.println(String.format("Could not find file: [%s]", path));
@@ -28,7 +28,7 @@ public class FilesCodeLinesCounterDemo {
     }
   }
 
-  private FileNode listFilesLinesCount(String directoryName, List<File> files, int nesting)
+  private static FileNode createFileNodes(String directoryName, List<File> files, int nesting)
       throws FileNotFoundException {
     File currentDirectory = new File(directoryName);
 
@@ -48,7 +48,7 @@ public class FilesCodeLinesCounterDemo {
         FileNode newLeaf = FileNode.createFile(file.getName(), linesCount);
         resultNode.addLeaf(newLeaf);
       } else if (file.isDirectory()) {
-        resultNode.addChild(listFilesLinesCount(file.getAbsolutePath(), files, nesting + 1));
+        resultNode.addChild(createFileNodes(file.getAbsolutePath(), files, nesting + 1));
       }
     }
     return resultNode;
